@@ -4,5 +4,7 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>T88 Audio Matrix cihazına bağlanmak ve kontrol etmek için yerel ağ erişimi gereklidir.</string>
 </dict>
 </plist>

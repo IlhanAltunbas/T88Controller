@@ -9,10 +9,7 @@ data class MixerUseCases(
     val setFeedbackSuppression: SetFeedbackSuppressionUseCase,
     val observeInputChannels: ObserveInputChannelsUseCase,
     val observeOutputChannels: ObserveOutputChannelsUseCase,
-    val getVolume: GetVolumeUseCase,
-    val getMuteState: GetMuteStateUseCase,
-    val getLineMicMode: GetLineMicModeUseCase,
-    val getPhantomPowerState: GetPhantomPowerStateUseCase,
-    val getFeedbackSuppression: GetFeedbackSuppressionUseCase,
-    val observeConnectionStatus: ObserveConnectionStatusUseCase
+    val observeConnectionStatus: ObserveConnectionStatusUseCase,
+    val observeMasterMute: ObserveMasterMuteUseCase,
+    val updateChannelName: UpdateChannelNameUseCase
 )

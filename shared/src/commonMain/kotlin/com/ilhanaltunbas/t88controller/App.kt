@@ -3,6 +3,10 @@ package com.ilhanaltunbas.t88controller
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import com.ilhanaltunbas.t88controller.di.appModule
 import com.ilhanaltunbas.t88controller.presentation.ui.ConnectionScreen
 import com.ilhanaltunbas.t88controller.presentation.ui.MainScreen
@@ -21,14 +25,60 @@ private val ProAudioDarkColorScheme = darkColorScheme(
     error = Color(0xFFCF6679) // Zarif, pastel bir kırmızı (Acil Mute vb. için)
 )
 
+// Sade ve Modern Tipografi (Sans-Serif)
+private val SimpleTypography = Typography(
+    displayLarge = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.W400,
+        fontSize = 57.sp,
+        lineHeight = 64.sp,
+        letterSpacing = (-0.25).sp
+    ),
+    headlineMedium = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 28.sp,
+        lineHeight = 36.sp
+    ),
+    titleLarge = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Medium,
+        fontSize = 22.sp,
+        lineHeight = 28.sp,
+        letterSpacing = 0.sp
+    ),
+    bodyLarge = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.5.sp
+    ),
+    bodyMedium = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Normal,
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.25.sp
+    ),
+    labelSmall = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Medium,
+        fontSize = 11.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.5.sp
+    )
+)
+
 @Composable
 fun App() {
     KoinApplication(application = {
         modules(appModule)
     }) {
-        // Özel karanlık temamızı tüm uygulamaya giydiriyoruz
+        // Özel karanlık temamızı ve sade fontumuzu tüm uygulamaya giydiriyoruz
         MaterialTheme(
-            colorScheme = ProAudioDarkColorScheme
+            colorScheme = ProAudioDarkColorScheme,
+            typography = SimpleTypography
         ) {
             var isConnected by remember { mutableStateOf(false) }
 

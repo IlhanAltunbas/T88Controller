@@ -1,13 +1,16 @@
 package com.ilhanaltunbas.t88controller.domain.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ChannelState(
-    val id: Int, // 1'den 8'e kadar
+    val id: Int,
     val name: String,
-    val isInput: Boolean, // True ise Input, False ise Output kanalıdır
-    val volume: Float = 75f,
-    val gain: Float = 50f, // Sadece Input kanalları için geçerli
+    val isInput: Boolean,
+    val volume: Float = 0f, // Varsayılan 0.0 dB
+    val gain: Float = 0f,   // Varsayılan 0.0 dB
     val isMuted: Boolean = false,
-    val isPhantomOn: Boolean = false, // Sadece Input
-    val isLineMode: Boolean = true, // Sadece Input
-    val afcLevel: Int = 0 // Sadece Input
+    val isPhantomOn: Boolean = false,
+    val isLineMode: Boolean = true,
+    val afcLevel: Int = 0
 )

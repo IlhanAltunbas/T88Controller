@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -26,6 +27,7 @@ fun ScenesScreen(
     viewModel: ScenesViewModel = koinInject()
 ) {
     val scenes by viewModel.scenes.collectAsState()
+    val activePreset by viewModel.activePreset.collectAsState()
 
     // Onay penceresi için state
     var sceneToRecall by remember { mutableStateOf<Int?>(null) }
@@ -61,26 +63,9 @@ fun ScenesScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF0F0F0F))
-            .padding(top = 16.dp, bottom = 16.dp)
+            .padding(top = 8.dp, bottom = 16.dp)
     ) {
-        // GEREKSİZ .let BLOĞU KALDIRILDI
-        Text(
-            text = "SAHNE YÖNETİMİ (PRESETS)",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Black,
-            letterSpacing = 2.sp,
-            color = Color(0xFFDDDDDD),
-            modifier = Modifier.padding(horizontal = 24.dp)
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "Cihaz hafızasındaki 30 sahneden birini çağırabilirsiniz.",
-            color = Color.Gray,
-            fontSize = 14.sp,
-            modifier = Modifier.padding(horizontal = 24.dp)
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
+        // GEREKSİZ BAŞLIKLAR KALDIRILDI
 
         // 30 Sahneyi listeleyen Grid yapısı
         LazyVerticalGrid(
@@ -91,24 +76,41 @@ fun ScenesScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             itemsIndexed(scenes) { index, sceneName ->
-                val sceneId = index + 1 // Cihazda sahneler 1'den 30'a kadar numaralandırılmış[cite: 1]
+                val sceneId = index + 1
+                val isActive = activePreset == sceneId
 
                 Box(
                     modifier = Modifier
-                        .aspectRatio(1f) // Kare şeklinde butonlar
+                        .aspectRatio(1f)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(Color(0xFF1A1A1A))
-                        .border(1.dp, Color(0xFF333333), RoundedCornerShape(12.dp))
+                        .background(if (isActive) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) else Color(0xFF1A1A1A))
+                        .border(
+                            width = if (isActive) 2.dp else 1.dp,
+                            color = if (isActive) MaterialTheme.colorScheme.primary else Color(0xFF333333),
+                            shape = RoundedCornerShape(12.dp)
+                        )
                         .clickable { sceneToRecall = sceneId }
                         .padding(8.dp),
                     contentAlignment = Alignment.Center
                 ) {
+                    if (isActive) {
+                        // Aktif Sahne Rozeti
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(4.dp)
+                                .size(8.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.primary)
+                        )
+                    }
+
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = sceneId.toString(),
-                            color = Color(0xFF555555),
+                            color = if (isActive) MaterialTheme.colorScheme.primary else Color(0xFF555555),
                             fontSize = 24.sp,
-                            fontWeight = FontWeight.Black
+                            fontWeight = FontWeight.SemiBold
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(

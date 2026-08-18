@@ -1,8 +1,12 @@
 package com.ilhanaltunbas.t88controller.presentation.ui
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -16,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,9 +34,10 @@ fun SystemScreen(
 ) {
     val isMasterMuted by viewModel.isMasterMuted.collectAsState()
     val connectionStatus by viewModel.connectionStatus.collectAsState()
+    val lastCameraPos by viewModel.lastCameraPosition.collectAsState()
 
-    var ipAddress by remember { mutableStateOf("192.168.1.100") }
-    var port by remember { mutableStateOf("5000") }
+    var ipAddress by remember { mutableStateOf(viewModel.currentIp) }
+    var port by remember { mutableStateOf(viewModel.currentPort) }
 
     Column(
         modifier = Modifier
@@ -86,24 +92,10 @@ fun SystemScreen(
         // GENEL KONTROLLER
         SystemSectionHeader("GENEL SES KONTROLÜ")
         
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(if (isMasterMuted) Color(0xFFB71C1C) else Color(0xFF1B5E20))
-                .clickable { viewModel.toggleMasterMute() }
-                .padding(24.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = if (isMasterMuted) "TÜM ÇIKIŞLAR SUSTURULDU (MUTED)" else "TÜM ÇIKIŞLAR AÇIK (UNMUTED)",
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
-            )
-        }
+        MasterMuteButton(
+            isMuted = isMasterMuted,
+            onClick = { viewModel.toggleMasterMute() }
+        )
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -112,15 +104,64 @@ fun SystemScreen(
         
         LazyVerticalGrid(
             columns = GridCells.Fixed(4),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
         ) {
-            item { CameraPosButton("VARSAYILAN", 0) { viewModel.setCameraPosition(0) } }
+            item { 
+                CameraPosButton(
+                    label = "DEF", 
+                    isSelected = lastCameraPos == 0
+                ) { viewModel.setCameraPosition(0) } 
+            }
             items((1..8).toList()) { id ->
-                CameraPosButton("KANAL $id", id) { viewModel.setCameraPosition(id) }
+                CameraPosButton(
+                    label = id.toString(), 
+                    isSelected = lastCameraPos == id
+                ) { viewModel.setCameraPosition(id) }
             }
         }
+    }
+}
+
+@Composable
+fun MasterMuteButton(isMuted: Boolean, onClick: () -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.96f else 1f,
+        animationSpec = spring(dampingRatio = 0.5f, stiffness = 600f),
+        label = "scale"
+    )
+
+    val backgroundColor by animateColorAsState(
+        targetValue = if (isMuted) Color(0xFFB71C1C) else Color(0xFF1B5E20),
+        animationSpec = tween(400),
+        label = "color"
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .graphicsLayer(scaleX = scale, scaleY = scale)
+            .clip(RoundedCornerShape(16.dp))
+            .background(backgroundColor)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = androidx.compose.material3.ripple(color = Color.White.copy(alpha = 0.2f))
+            ) { onClick() }
+            .padding(24.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = if (isMuted) "TÜM ÇIKIŞLAR SUSTURULDU (MUTED)" else "TÜM ÇIKIŞLAR AÇIK (UNMUTED)",
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+            letterSpacing = 0.5.sp
+        )
     }
 }
 
@@ -130,27 +171,50 @@ fun SystemSectionHeader(title: String) {
         text = title,
         color = Color.Gray,
         fontSize = 12.sp,
-        fontWeight = FontWeight.Bold,
-        letterSpacing = 1.sp,
+        fontWeight = FontWeight.SemiBold,
+        letterSpacing = 1.2.sp,
         modifier = Modifier.padding(bottom = 8.dp)
     )
 }
 
 @Composable
-fun CameraPosButton(label: String, id: Int, onClick: () -> Unit) {
+fun CameraPosButton(label: String, isSelected: Boolean, onClick: () -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.92f else 1f,
+        animationSpec = spring(dampingRatio = 0.4f, stiffness = 600f),
+        label = "scale"
+    )
+
+    val backgroundColor by animateColorAsState(
+        targetValue = if (isSelected) MaterialTheme.colorScheme.primary else Color(0xFF1A1A1A),
+        animationSpec = tween(300),
+        label = "bg"
+    )
+
     Box(
         modifier = Modifier
             .aspectRatio(1.2f)
-            .clip(RoundedCornerShape(8.dp))
-            .background(Color(0xFF222222))
-            .border(1.dp, Color(0xFF333333), RoundedCornerShape(8.dp))
-            .clickable { onClick() },
+            .graphicsLayer(scaleX = scale, scaleY = scale)
+            .clip(RoundedCornerShape(12.dp))
+            .background(backgroundColor)
+            .border(
+                width = if (isSelected) 2.dp else 1.dp, 
+                color = if (isSelected) Color.White.copy(alpha = 0.5f) else Color(0xFF333333), 
+                shape = RoundedCornerShape(12.dp)
+            )
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null
+            ) { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = if (id == 0) "DEF" else id.toString(),
-            color = Color.White,
-            fontWeight = FontWeight.Black,
+            text = label,
+            color = if (isSelected) MaterialTheme.colorScheme.onPrimary else Color.Gray,
+            fontWeight = FontWeight.SemiBold,
             fontSize = 18.sp
         )
     }

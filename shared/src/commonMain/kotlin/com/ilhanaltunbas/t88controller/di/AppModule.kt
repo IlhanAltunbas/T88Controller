@@ -2,7 +2,9 @@ package com.ilhanaltunbas.t88controller.di
 
 import com.ilhanaltunbas.t88controller.data.remote.TcpSocketClient
 import com.ilhanaltunbas.t88controller.data.repository.AudioMatrixRepositoryImpl
+import com.ilhanaltunbas.t88controller.data.repository.SettingsRepositoryImpl
 import com.ilhanaltunbas.t88controller.domain.repository.AudioMatrixRepository
+import com.ilhanaltunbas.t88controller.domain.repository.SettingsRepository
 import com.ilhanaltunbas.t88controller.domain.usecase.*
 import com.ilhanaltunbas.t88controller.presentation.viewmodel.*
 import org.koin.core.module.dsl.bind
@@ -14,6 +16,7 @@ import org.koin.dsl.module
 val appModule = module {
     singleOf(::TcpSocketClient)
     singleOf(::AudioMatrixRepositoryImpl) { bind<AudioMatrixRepository>() }
+    singleOf(::SettingsRepositoryImpl) { bind<SettingsRepository>() }
 
     factoryOf(::SetAbsoluteVolumeUseCase)
     factoryOf(::SetRelativeVolumeUseCase)
@@ -24,32 +27,29 @@ val appModule = module {
     factoryOf(::SetFeedbackSuppressionUseCase)
     factoryOf(::SetCameraPositionUseCase)
     factoryOf(::SetRoutingUseCase)
+    factoryOf(::UpdateChannelNameUseCase)
     factoryOf(::RecallSceneUseCase)
     factoryOf(::ConnectToDeviceUseCase)
-    factoryOf(::GetVolumeUseCase)
-    factoryOf(::GetMuteStateUseCase)
-    factoryOf(::GetLineMicModeUseCase)
-    factoryOf(::GetPhantomPowerStateUseCase)
-    factoryOf(::GetFeedbackSuppressionUseCase)
-    factoryOf(::GetRoutingUseCase)
-    factoryOf(::GetCurrentPresetUseCase)
+    factoryOf(::SyncDeviceDataUseCase)
     factoryOf(::ObserveConnectionStatusUseCase)
+    factoryOf(::ObserveSyncStatusUseCase)
     factoryOf(::ObserveInputChannelsUseCase)
     factoryOf(::ObserveOutputChannelsUseCase)
     factoryOf(::ObserveActiveRoutesUseCase)
     factoryOf(::ObserveCurrentPresetUseCase)
     factoryOf(::ObserveMasterMuteUseCase)
+    factoryOf(::ObserveCameraPositionUseCase)
     factoryOf(::DisconnectDeviceUseCase)
     
     factory { 
         MixerUseCases(
-            get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()
+            get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()
         )
     }
 
     viewModelOf(::ConnectionViewModel)
     factory { MixerViewModel(get()) }
-    viewModelOf(::MatrixViewModel)
+    factory { MatrixViewModel(get(), get(), get(), get()) }
     viewModelOf(::ScenesViewModel)
     viewModelOf(::SystemViewModel)
 }

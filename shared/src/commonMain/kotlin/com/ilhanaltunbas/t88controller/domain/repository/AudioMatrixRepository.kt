@@ -16,10 +16,13 @@ interface AudioMatrixRepository {
     val activeRoutes: StateFlow<Set<Pair<Int, Int>>>
     val currentPreset: StateFlow<Int>
     val isMasterMuted: StateFlow<Boolean>
+    val isSyncing: StateFlow<Boolean>
+    val cameraPosition: StateFlow<Int>
 
     suspend fun connectToDevice(ip: String, port: Int): Boolean
     suspend fun disconnectDevice()
     fun getConnectionStatus(): StateFlow<ConnectionStatus>
+    suspend fun syncAllData()
 
     // --- KONTROL (WRITE) METOTLARI ---
     suspend fun setMuteState(channelType: Int, channel: Int, isMuted: Boolean): Boolean
@@ -34,6 +37,7 @@ interface AudioMatrixRepository {
     suspend fun setLineMicMode(channel: Int, isLine: Boolean): Boolean
     suspend fun setPhantomPower(channel: Int, isEnabled: Boolean): Boolean
     suspend fun setFeedbackSuppression(channel: Int, level: Int): Boolean
+    fun updateChannelName(id: Int, isInput: Boolean, newName: String)
 
     // --- SORGULAMA (READ) METOTLARI ---
     suspend fun getMuteState(channelType: Int, channel: Int): Boolean
@@ -42,8 +46,6 @@ interface AudioMatrixRepository {
     suspend fun getLineMicMode(channel: Int): Boolean
     suspend fun getPhantomPowerState(channel: Int): Boolean
     suspend fun getFeedbackSuppression(channel: Int): Int
-    suspend fun getRouting(inputChannel: Int, outputChannel: Int): Boolean
 
-    // BURASI DA INT OLMALI
     suspend fun getCurrentPreset(): Int
 }
