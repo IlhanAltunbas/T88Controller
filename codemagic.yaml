@@ -1,0 +1,24 @@
+workflows:
+  ios-unsigned-build:
+    name: iOS Unsigned Build (KMP)
+    instance_type: mac_mini_m1
+    environment:
+      java: 17
+      xcode: latest
+    scripts:
+      - name: Set up local.properties
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+      - name: Build iOS (Unsigned)
+        script: |
+          cd iosApp
+          # Xcode projesini imzasız olarak derle
+          xcodebuild clean build -project iosApp.xcodeproj -scheme iosApp -configuration Release -destination generic/platform=iOS CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CONFIGURATION_BUILD_DIR=$(PWD)/build/Release-iphoneos
+          
+          # Sideloading (telefonuna kabloyla kurabilmen) için .app dosyasını .ipa formatına çevir
+          cd build/Release-iphoneos
+          mkdir -p Payload
+          cp -R iosApp.app Payload
+          zip -r ../../iosApp-unsigned.ipa Payload
+    artifacts:
+      - iosApp/iosApp-unsigned.ipa
