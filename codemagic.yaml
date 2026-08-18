@@ -15,10 +15,10 @@ workflows:
           # Xcode projesini imzasız olarak derle
           xcodebuild clean build -project iosApp.xcodeproj -scheme iosApp -configuration Release -destination generic/platform=iOS CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CONFIGURATION_BUILD_DIR=$(PWD)/build/Release-iphoneos
           
-          # Sideloading (telefonuna kabloyla kurabilmen) için .app dosyasını .ipa formatına çevir
+          # Sideloading için .app dosyasını .ipa formatına çevir
           cd build/Release-iphoneos
           mkdir -p Payload
-          cp -R iosApp.app Payload
-          zip -r ../../iosApp-unsigned.ipa Payload
+          cp -R T88Controller.app Payload
+          zip -r ../../T88Controller-unsigned.ipa Payload
     artifacts:
-      - iosApp/iosApp-unsigned.ipa
+      - iosApp/T88Controller-unsigned.ipa
