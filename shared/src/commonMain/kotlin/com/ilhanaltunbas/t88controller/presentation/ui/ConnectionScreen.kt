@@ -99,7 +99,7 @@ fun ConnectionScreen(
                         onValueChange = { ipAddress = it },
                         label = { Text("IP Adresi") },
                         singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text), // iOS'te nokta sorunu için Text yapıldı
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = Color.White,
